@@ -31,10 +31,14 @@
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.panelLeft = new System.Windows.Forms.Panel();
+            this.labelLeft = new System.Windows.Forms.Label();
             this.panelCenter = new System.Windows.Forms.Panel();
             this.popupWindow = new Piskvorky.PopupWindow();
             this.panelRight = new System.Windows.Forms.Panel();
+            this.labelRight = new System.Windows.Forms.Label();
+            this.panelLeft.SuspendLayout();
             this.panelCenter.SuspendLayout();
+            this.panelRight.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStrip
@@ -55,11 +59,22 @@
             // 
             // panelLeft
             // 
+            this.panelLeft.Controls.Add(this.labelLeft);
             this.panelLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.panelLeft.Location = new System.Drawing.Point(0, 25);
             this.panelLeft.Name = "panelLeft";
             this.panelLeft.Size = new System.Drawing.Size(120, 404);
             this.panelLeft.TabIndex = 2;
+            // 
+            // labelLeft
+            // 
+            this.labelLeft.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelLeft.Location = new System.Drawing.Point(0, 10);
+            this.labelLeft.Margin = new System.Windows.Forms.Padding(0, 10, 0, 0);
+            this.labelLeft.Name = "labelLeft";
+            this.labelLeft.Size = new System.Drawing.Size(120, 23);
+            this.labelLeft.TabIndex = 0;
+            this.labelLeft.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panelCenter
             // 
@@ -82,15 +97,25 @@
             this.popupWindow.Padding = new System.Windows.Forms.Padding(3);
             this.popupWindow.Size = new System.Drawing.Size(300, 180);
             this.popupWindow.TabIndex = 0;
-            this.popupWindow.Visible = false;
             // 
             // panelRight
             // 
+            this.panelRight.Controls.Add(this.labelRight);
             this.panelRight.Dock = System.Windows.Forms.DockStyle.Right;
             this.panelRight.Location = new System.Drawing.Point(674, 25);
             this.panelRight.Name = "panelRight";
             this.panelRight.Size = new System.Drawing.Size(120, 404);
             this.panelRight.TabIndex = 4;
+            // 
+            // labelRight
+            // 
+            this.labelRight.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.labelRight.Location = new System.Drawing.Point(0, 10);
+            this.labelRight.Margin = new System.Windows.Forms.Padding(0, 10, 0, 0);
+            this.labelRight.Name = "labelRight";
+            this.labelRight.Size = new System.Drawing.Size(120, 23);
+            this.labelRight.TabIndex = 1;
+            this.labelRight.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // MainForm
             // 
@@ -105,7 +130,9 @@
             this.MinimumSize = new System.Drawing.Size(656, 486);
             this.Name = "MainForm";
             this.Text = "Form";
+            this.panelLeft.ResumeLayout(false);
             this.panelCenter.ResumeLayout(false);
+            this.panelRight.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -119,5 +146,7 @@
         private Panel panelCenter;
         private Panel panelRight;
         private PopupWindow popupWindow;
+        private Label labelLeft;
+        private Label labelRight;
     }
 }

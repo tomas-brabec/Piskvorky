@@ -12,6 +12,8 @@ namespace Piskvorky
         public MainForm()
         {
             InitializeComponent();
+            popupWindow.btnConfirm.Click += btnConfirm_Click;
+            popupWindow.btnCancel.Click += btnCancel_Click;
             game = new Game(16);
         }
 
@@ -110,14 +112,20 @@ namespace Piskvorky
             }
         }
 
-        //private void btnCancel_Click(object sender, EventArgs e)
-        //{
+        private void btnCancel_Click(object? sender, EventArgs e)
+        {
 
-        //}
+        }
 
-        //private void btnConfirm_Click(object sender, EventArgs e)
-        //{
+        private void btnConfirm_Click(object? sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(popupWindow.textBoxPrompt.Text))
+                game.PlayerName = $"Player {Random.Shared.Next(100, 1000)}";
+            else
+                game.PlayerName = popupWindow.textBoxPrompt.Text;
 
-        //}
+            labelLeft.Text = game.PlayerName;
+            popupWindow.Visible = false;
+        }
     }
 }

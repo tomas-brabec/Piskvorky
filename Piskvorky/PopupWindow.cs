@@ -15,6 +15,7 @@ namespace Piskvorky
         public PopupWindow()
         {
             InitializeComponent();
+            SetPromptMode();
         }
 
         public void Center()
