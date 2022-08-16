@@ -69,6 +69,7 @@
             this.panelCenter.Name = "panelCenter";
             this.panelCenter.Size = new System.Drawing.Size(554, 404);
             this.panelCenter.TabIndex = 3;
+            this.panelCenter.Paint += new System.Windows.Forms.PaintEventHandler(this.panelCenter_Paint);
             this.panelCenter.Resize += new System.EventHandler(this.panelCenter_Resize);
             // 
             // popupWindow
@@ -76,10 +77,12 @@
             this.popupWindow.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.popupWindow.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.popupWindow.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.popupWindow.Location = new System.Drawing.Point(10, 10);
+            this.popupWindow.Location = new System.Drawing.Point(127, 112);
             this.popupWindow.Name = "popupWindow";
+            this.popupWindow.Padding = new System.Windows.Forms.Padding(3);
             this.popupWindow.Size = new System.Drawing.Size(300, 180);
             this.popupWindow.TabIndex = 0;
+            this.popupWindow.Visible = false;
             // 
             // panelRight
             // 
