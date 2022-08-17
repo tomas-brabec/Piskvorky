@@ -15,6 +15,7 @@ namespace Piskvorky
 
         public string PlayerName { get; set; }
         public Player PlayerMark { get; set; }
+        public Player OpponentMark => PlayerMark == Player.X ? Player.O : Player.X;
         public Player CurrentPlayer { get; set; }
 
         public bool IsRunning { get; set; }

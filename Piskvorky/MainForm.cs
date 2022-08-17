@@ -12,6 +12,9 @@ namespace Piskvorky
         private float originX;
         private float originY;
 
+        private Color colorX = Color.Red;
+        private Color colorO = Color.Blue;
+
         private CancellationTokenSource? cts;
 
         public MainForm()
@@ -93,7 +96,7 @@ namespace Piskvorky
                     if (cell == (int)Player.X)
                     {
                         //draw X
-                        var bluePen = new Pen(Color.Blue, penWidth);
+                        var bluePen = new Pen(colorX, penWidth);
                         graphics.DrawLine(bluePen,
                             cellOriginX + cellMargin,
                             cellOriginY + cellMargin,
@@ -108,7 +111,7 @@ namespace Piskvorky
                     else
                     {
                         //draw O
-                        graphics.DrawEllipse(new Pen(Color.Red, penWidth),
+                        graphics.DrawEllipse(new Pen(colorO, penWidth),
                             cellOriginX + cellMargin,
                             cellOriginY + cellMargin,
                             space - cellMargin * 2,
@@ -182,6 +185,7 @@ namespace Piskvorky
             {
                 labelRight.Text = message.Name;
                 game.IsRunning = true;
+                RedrawMarks();
             }
         }
 
@@ -230,6 +234,7 @@ namespace Piskvorky
                 game.PlayerMark = message.Mark == Player.X ? Player.O : Player.X;
                 labelRight.Text = message.Name;
                 game.IsRunning = true;
+                RedrawMarks();
             }
         }
 
@@ -237,6 +242,63 @@ namespace Piskvorky
         {
             btnRunServer.Enabled = enable;
             btnConnectToServer.Enabled = enable;
+        }
+
+        private void panelLeft_Paint(object sender, PaintEventArgs e)
+        {
+            DrawPlayerMark(sender as Control, game.PlayerMark, e.Graphics);
+        }
+
+        private void panelRight_Paint(object sender, PaintEventArgs e)
+        {
+            DrawPlayerMark(sender as Control, game.OpponentMark, e.Graphics);
+        }
+
+        private void RedrawMarks()
+        {
+            panelLeft.Invalidate();
+            panelRight.Invalidate();
+        }
+
+        private void DrawPlayerMark(Control? sender, Player playerMark, Graphics graphics)
+        {
+            if (sender is null)
+                return;
+
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.Clear(SystemColors.Control);
+
+            if (game.IsRunning)
+            {
+                var size = 40f;
+                var penWidth = 8;
+                var originX = sender.Width / 2 - size / 2;
+                var originY = 40;
+                var isCurrent = game.CurrentPlayer == playerMark;
+
+                if (playerMark == Player.X)
+                {
+                    var bluePen = new Pen(isCurrent ? colorX : Color.Gray, penWidth);
+                    graphics.DrawLine(bluePen,
+                        originX,
+                        originY,
+                        originX + size,
+                        originY + size);
+                    graphics.DrawLine(bluePen,
+                        originX,
+                        originY + size,
+                        originX + size,
+                        originY);
+                }
+                else
+                {
+                    graphics.DrawEllipse(new Pen(isCurrent ? colorO : Color.Gray, penWidth),
+                            originX,
+                            originY,
+                            size,
+                            size);
+                }
+            }
         }
     }
 }
