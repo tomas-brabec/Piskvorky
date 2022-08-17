@@ -121,9 +121,37 @@ namespace Piskvorky
             }
         }
 
+        private void panelCenter_Click(object sender, EventArgs e)
+        {
+            var args = e as MouseEventArgs;
+
+            if (args is null)
+                return;
+
+            var x = args.X;
+            var y = args.Y;
+
+            if (x < originX || x > originX + size || y < originY || y > originY + size)
+                return;
+
+            var coordinates = ConvertToBoardCoordinates(x, y);
+            if (game.NextTurn(coordinates.x, coordinates.y))
+            {
+                panelCenter.Invalidate();
+                RedrawMarks();
+            }
+                
+        }
+        private (int x, int y) ConvertToBoardCoordinates(int x, int y)
+        {
+            var cx = (x - originX) / (size / game.BoardSize);
+            var cy = (y - originY) / (size / game.BoardSize);
+
+            return ((int)cx, (int)cy);
+        }
+
         private void btnCancel_Click(object? sender, EventArgs e)
         {
-            popupWindow.Visible = false;
             cts?.Cancel();
         }
 

@@ -33,6 +33,18 @@ namespace Piskvorky
                 for (int j = 0; j < Board.GetLength(1); j++)
                     Board[i, j] = 0;
         }
+
+        public bool NextTurn(int x, int y)
+        {
+            if (Board[x, y] == (int)Player.Empty)
+            {
+                Board[x, y] = (int)CurrentPlayer;
+                CurrentPlayer = CurrentPlayer == Player.X ? Player.O : Player.X;
+                return true;
+            }
+
+            return false;
+        }
     }
 
     internal enum Player

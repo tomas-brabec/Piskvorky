@@ -125,6 +125,7 @@
             this.panelCenter.Name = "panelCenter";
             this.panelCenter.Size = new System.Drawing.Size(554, 404);
             this.panelCenter.TabIndex = 3;
+            this.panelCenter.Click += new System.EventHandler(this.panelCenter_Click);
             this.panelCenter.Paint += new System.Windows.Forms.PaintEventHandler(this.panelCenter_Paint);
             this.panelCenter.Resize += new System.EventHandler(this.panelCenter_Resize);
             // 
