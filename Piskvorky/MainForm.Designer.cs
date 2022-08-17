@@ -28,7 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStrip = new System.Windows.Forms.ToolStrip();
+            this.btnRunServer = new System.Windows.Forms.ToolStripButton();
+            this.btnConnectToServer = new System.Windows.Forms.ToolStripButton();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.panelLeft = new System.Windows.Forms.Panel();
             this.labelLeft = new System.Windows.Forms.Label();
@@ -36,6 +39,9 @@
             this.popupWindow = new Piskvorky.PopupWindow();
             this.panelRight = new System.Windows.Forms.Panel();
             this.labelRight = new System.Windows.Forms.Label();
+            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStrip.SuspendLayout();
+            this.statusStrip.SuspendLayout();
             this.panelLeft.SuspendLayout();
             this.panelCenter.SuspendLayout();
             this.panelRight.SuspendLayout();
@@ -43,14 +49,43 @@
             // 
             // toolStrip
             // 
+            this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnRunServer,
+            this.btnConnectToServer});
             this.toolStrip.Location = new System.Drawing.Point(0, 0);
             this.toolStrip.Name = "toolStrip";
             this.toolStrip.Size = new System.Drawing.Size(794, 25);
             this.toolStrip.TabIndex = 0;
             this.toolStrip.Text = "toolStrip1";
             // 
+            // btnRunServer
+            // 
+            this.btnRunServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnRunServer.Enabled = false;
+            this.btnRunServer.Image = ((System.Drawing.Image)(resources.GetObject("btnRunServer.Image")));
+            this.btnRunServer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnRunServer.Name = "btnRunServer";
+            this.btnRunServer.Size = new System.Drawing.Size(81, 22);
+            this.btnRunServer.Text = "Spustit server";
+            this.btnRunServer.ToolTipText = "Spuštění serveru a vyčkání na protihráče";
+            this.btnRunServer.Click += new System.EventHandler(this.btnRunServer_Click);
+            // 
+            // btnConnectToServer
+            // 
+            this.btnConnectToServer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnConnectToServer.Enabled = false;
+            this.btnConnectToServer.Image = ((System.Drawing.Image)(resources.GetObject("btnConnectToServer.Image")));
+            this.btnConnectToServer.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnConnectToServer.Name = "btnConnectToServer";
+            this.btnConnectToServer.Size = new System.Drawing.Size(63, 22);
+            this.btnConnectToServer.Text = "Připojit se";
+            this.btnConnectToServer.ToolTipText = "Nalezení serveru a připojení k serveru";
+            this.btnConnectToServer.Click += new System.EventHandler(this.btnConnectToServer_Click);
+            // 
             // statusStrip
             // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statusLabel});
             this.statusStrip.Location = new System.Drawing.Point(0, 429);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(794, 22);
@@ -117,6 +152,11 @@
             this.labelRight.TabIndex = 1;
             this.labelRight.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // statusLabel
+            // 
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -130,6 +170,10 @@
             this.MinimumSize = new System.Drawing.Size(656, 486);
             this.Name = "MainForm";
             this.Text = "Form";
+            this.toolStrip.ResumeLayout(false);
+            this.toolStrip.PerformLayout();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.panelLeft.ResumeLayout(false);
             this.panelCenter.ResumeLayout(false);
             this.panelRight.ResumeLayout(false);
@@ -148,5 +192,8 @@
         private PopupWindow popupWindow;
         private Label labelLeft;
         private Label labelRight;
+        private ToolStripButton btnRunServer;
+        private ToolStripButton btnConnectToServer;
+        private ToolStripStatusLabel statusLabel;
     }
 }

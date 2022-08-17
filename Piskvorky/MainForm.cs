@@ -1,13 +1,18 @@
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
+using System.Net.Sockets;
 
 namespace Piskvorky
 {
     public partial class MainForm : Form
     {
         private Game game;
+        private NetworkConnection connection;
+
         private float size;
         private float originX;
         private float originY;
+
+        private CancellationTokenSource? cts;
 
         public MainForm()
         {
@@ -15,6 +20,7 @@ namespace Piskvorky
             popupWindow.btnConfirm.Click += btnConfirm_Click;
             popupWindow.btnCancel.Click += btnCancel_Click;
             game = new Game(16);
+            connection = new NetworkConnection();
         }
 
         private void panelCenter_Resize(object sender, EventArgs e)
@@ -114,18 +120,123 @@ namespace Piskvorky
 
         private void btnCancel_Click(object? sender, EventArgs e)
         {
-
+            popupWindow.Visible = false;
+            cts?.Cancel();
         }
 
         private void btnConfirm_Click(object? sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(popupWindow.textBoxPrompt.Text))
+            var name = popupWindow.textBoxPrompt.Text.Trim();
+            if (string.IsNullOrEmpty(name))
                 game.PlayerName = $"Player {Random.Shared.Next(100, 1000)}";
             else
                 game.PlayerName = popupWindow.textBoxPrompt.Text;
 
             labelLeft.Text = game.PlayerName;
             popupWindow.Visible = false;
+
+            EnableNetworkButtons(true);
+        }
+
+        private async void btnRunServer_Click(object sender, EventArgs e)
+        {
+            EnableNetworkButtons(false);
+            popupWindow.SetInfoMode("Server čeká na připojení protihráče...");
+
+            cts = new CancellationTokenSource();
+            game.PlayerMark = (Player)Random.Shared.Next(1, 3);
+            game.CurrentPlayer = Player.O;
+
+            NetworkMessage message = null!;
+
+            popupWindow.Visible = true;
+
+            try
+            {
+                message = await connection.RunServerAsync(game.PlayerName, game.PlayerMark, cts.Token);
+            }
+            catch (SocketException ex)
+            {
+                statusLabel.Text = ex.Message;
+            }
+            catch (OperationCanceledException ex)
+            {
+                statusLabel.Text = ex.Message;
+                //TODO
+            }
+            catch (InvalidDataException ex)
+            {
+                statusLabel.Text = ex.Message;
+            }
+            finally
+            {
+                cts.Dispose();
+                popupWindow.Visible = false;
+            }
+
+            if (message is null)
+            {
+                EnableNetworkButtons(true);
+            }
+            else
+            {
+                labelRight.Text = message.Name;
+                game.IsRunning = true;
+            }
+        }
+
+        private async void btnConnectToServer_Click(object sender, EventArgs e)
+        {
+            EnableNetworkButtons(false);
+            popupWindow.SetInfoMode("Hledám server...");
+
+            cts = new CancellationTokenSource();
+            game.CurrentPlayer = Player.O;
+
+            NetworkMessage message = null!;
+
+            popupWindow.Visible = true;
+
+            try
+            {
+                message = await connection.ConnectToServerAsync(game.PlayerName, cts.Token);
+                await Task.Delay(200);
+            }
+            catch (SocketException ex)
+            {
+                statusLabel.Text = ex.Message;
+            }
+            catch (OperationCanceledException ex)
+            {
+                statusLabel.Text = ex.Message;
+                //TODO
+            }
+            catch (InvalidDataException ex)
+            {
+                statusLabel.Text = ex.Message;
+            }
+            finally
+            {
+                cts.Dispose();
+                popupWindow.Visible = false;
+            }
+
+            if (message is null)
+            {
+                EnableNetworkButtons(true);
+            }
+            else
+            {
+                game.PlayerMark = message.Mark == Player.X ? Player.O : Player.X;
+                labelRight.Text = message.Name;
+                game.IsRunning = true;
+            }
+        }
+
+        private void EnableNetworkButtons(bool enable)
+        {
+            btnRunServer.Enabled = enable;
+            btnConnectToServer.Enabled = enable;
         }
     }
 }

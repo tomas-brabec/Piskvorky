@@ -26,7 +26,7 @@ namespace Piskvorky
 
         private void PopupWindow_VisibleChanged(object sender, EventArgs e)
         {
-            if(Visible == true)
+            if (Visible == true)
                 Center();
         }
 
