@@ -14,16 +14,12 @@ namespace Piskvorky
         public static int serverPort = 40701;
         public static int clientPort = 40702;
 
-        //private UdpClient? udpClient;
-        //private TcpListener? tcpListener;
         private TcpClient? tcpClient;
-
-        private IPEndPoint? connection;
 
         public async Task<NetworkMessage> RunServerAsync(string playerName, Player playerMark, CancellationToken token)
         {
             var acceptedConnection = new IPEndPoint(IPAddress.Any, serverPort);
-            var response = new NetworkMessage() { Type = MessageType.Handshake, Name = playerName, Mark = playerMark };
+            var response = new NetworkMessage() { Name = playerName, Mark = playerMark };
             UdpClient udpClient = null!;
             TcpListener tcpListener = null!;
 
@@ -69,7 +65,7 @@ namespace Piskvorky
         {
             UdpClient udpClient = null!;
             var acceptedConnection = new IPEndPoint(IPAddress.Any, clientPort);
-            var request = new NetworkMessage() { Type = MessageType.Handshake, Name = player };
+            var request = new NetworkMessage() { Name = player };
 
             try
             {
@@ -97,7 +93,7 @@ namespace Piskvorky
             var requestBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request));
 
             await client.SendAsync(requestBytes, broadcastConnection, token);
-            var responseData = await client.ReceiveAsync();
+            var responseData = await client.ReceiveAsync(token);
 
             var message = JsonSerializer.Deserialize<NetworkMessage>(Encoding.UTF8.GetString(responseData.Buffer));
             if (message is null)
@@ -105,11 +101,21 @@ namespace Piskvorky
 
             return (message, responseData.RemoteEndPoint);
         }
+
+        public async Task SendMessage()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<NetworkMessage> ReceiveMessage()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal class NetworkMessage
     {
-        public MessageType Type { get; set; }
+        //public MessageType Type { get; set; }
 
         public string Name { get; set; } = "";
         public Player Mark { get; set; }
@@ -117,10 +123,10 @@ namespace Piskvorky
         public int Y { get; set; } = -1;
     }
 
-    internal enum MessageType
+    /*internal enum MessageType
     {
         Handshake,
         NextTurn,
         ConnectionClosed,
-    }
+    }*/
 }
