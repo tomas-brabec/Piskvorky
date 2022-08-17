@@ -119,10 +119,26 @@ namespace Piskvorky
                     }
                 }
             }
+
+            //draw winning row
+            if (game.IsWinner)
+            {
+                var start = game.First;
+                var end = game.Last;
+
+                graphics.DrawLine(new Pen(Color.Gray, penWidth * 2),
+                    originX + start.x * space + space / 2,
+                    originY + start.y * space + space / 2,
+                    originX + end.x * space + space / 2,
+                    originY + end.y * space + space / 2);
+            }
         }
 
         private void panelCenter_Click(object sender, EventArgs e)
         {
+            if (!game.IsRunning && game.IsWinner)
+                return;
+
             var args = e as MouseEventArgs;
 
             if (args is null)
@@ -137,10 +153,18 @@ namespace Piskvorky
             var coordinates = ConvertToBoardCoordinates(x, y);
             if (game.NextTurn(coordinates.x, coordinates.y))
             {
+                if (game.IsWinner)
+                {
+                    game.IsRunning = false;
+                }
+                else
+                {
+                    game.CurrentPlayer = game.CurrentPlayer == Player.X ? Player.O : Player.X;
+                }
                 panelCenter.Invalidate();
-                RedrawMarks();
             }
-                
+
+
         }
         private (int x, int y) ConvertToBoardCoordinates(int x, int y)
         {

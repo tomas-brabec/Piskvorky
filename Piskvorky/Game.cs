@@ -19,12 +19,18 @@ namespace Piskvorky
         public Player CurrentPlayer { get; set; }
 
         public bool IsRunning { get; set; }
+        public bool IsWinner { get; set; }
+
+        public (int x, int y) First { get; set; }
+        public (int x, int y) Last { get; set; }
 
         public Game(int boardSize)
         {
             BoardSize = boardSize;
             Board = new int[BoardSize, BoardSize];
             PlayerName = $"Player {Random.Shared.Next(100, 1000)}";
+
+            CurrentPlayer = Player.X;
         }
 
         public void Reset()
@@ -32,6 +38,9 @@ namespace Piskvorky
             for (int i = 0; i < Board.GetLength(0); i++)
                 for (int j = 0; j < Board.GetLength(1); j++)
                     Board[i, j] = 0;
+
+            IsWinner = false;
+            IsRunning = false;
         }
 
         public bool NextTurn(int x, int y)
@@ -39,11 +48,88 @@ namespace Piskvorky
             if (Board[x, y] == (int)Player.Empty)
             {
                 Board[x, y] = (int)CurrentPlayer;
-                CurrentPlayer = CurrentPlayer == Player.X ? Player.O : Player.X;
+                FindRow(x, y);
                 return true;
             }
 
             return false;
+        }
+
+        private void FindRow(int startX, int startY)
+        {
+            var vectorsToCheck = new int[,] { { 1, 0 }, { 0, 1 }, { 1, -1 }, { 1, 1 } };
+            (int x, int y) first = (startX, startY);
+            (int x, int y) last = (startX, startY);
+
+            for (int i = 0; i < vectorsToCheck.GetLength(0); i++)
+            {
+                var forward = true;
+                var backward = true;
+                var count = 1;
+
+                for (int j = 1; j <= 5; j++)
+                {
+                    if (forward)
+                    {
+                        var nextX = startX + vectorsToCheck[i, 0] * j;
+                        var nextY = startY + vectorsToCheck[i, 1] * j;
+                        if (IsInRange(nextX, nextY))
+                        {
+                            if (Board[nextX, nextY] == (int)CurrentPlayer)
+                            {
+                                last = (nextX, nextY);
+                                count++;
+                            }
+                            else
+                            {
+                                forward = false;
+                            }
+                        }
+                        else
+                        {
+                            forward = false;
+                        }
+                    }
+
+                    if (backward)
+                    {
+                        var nextX = startX + vectorsToCheck[i, 0] * j * -1;
+                        var nextY = startY + vectorsToCheck[i, 1] * j * -1;
+                        if (IsInRange(nextX, nextY))
+                        {
+                            if (Board[nextX, nextY] == (int)CurrentPlayer)
+                            {
+                                first = (nextX, nextY);
+                                count++;
+                            }
+                            else
+                            {
+                                backward = false;
+                            }
+                        }
+                        else
+                        {
+                            backward = false;
+                        }
+                    }
+
+                    if (count >= 5)
+                    {
+                        IsWinner = true;
+                        First = first;
+                        Last = last;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private bool IsInRange(int x, int y)
+        {
+            if (x >= 0 && x < BoardSize && y >= 0 && y < BoardSize)
+                return true;
+            else
+                return false;
         }
     }
 
