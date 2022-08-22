@@ -50,7 +50,7 @@
         private void FindRow(int startX, int startY)
         {
             var vectorsToCheck = new int[,] { { 1, 0 }, { 0, 1 }, { 1, -1 }, { 1, 1 } };
-            var rowSize = 2;
+            var rowSize = 5;
             (int x, int y) first = (startX, startY);
             (int x, int y) last = (startX, startY);
 
