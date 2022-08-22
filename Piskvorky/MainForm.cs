@@ -24,6 +24,28 @@ namespace Piskvorky
             popupWindow.btnCancel.Click += btnCancel_Click;
             game = new Game(16);
             connection = new NetworkConnection();
+            connection.OnMessageReceive += Connection_OnMessageReceive;
+        }
+
+        private void Connection_OnMessageReceive(object? sender, MessageArgs e)
+        {
+            game.NextMove(e.NetworkMessage.X, e.NetworkMessage.Y);
+            if (game.Winner)
+            {
+                game.IsRunning = false;
+                connection.Close();
+                var winner = game.CurrentPlayer == game.PlayerMark ? labelLeft.Text : labelRight.Text;
+                popupWindow.SetInfoMode($"Vyhrává hráč {winner}");
+                popupWindow.Visible = true;
+                cts?.Cancel();
+            }
+            else
+            {
+                game.CurrentPlayer = game.CurrentPlayer == Player.X ? Player.O : Player.X;
+                RedrawMarks();
+            }
+
+            panelCenter.Invalidate();
         }
 
         private void panelCenter_Resize(object sender, EventArgs e)
@@ -121,7 +143,7 @@ namespace Piskvorky
             }
 
             //draw winning row
-            if (game.IsWinner)
+            if (game.Winner)
             {
                 var start = game.First;
                 var end = game.Last;
@@ -134,9 +156,9 @@ namespace Piskvorky
             }
         }
 
-        private void panelCenter_Click(object sender, EventArgs e)
+        private async void panelCenter_Click(object sender, EventArgs e)
         {
-            if (!game.IsRunning && game.IsWinner)
+            if (!game.IsRunning || game.PlayerMark != game.CurrentPlayer)
                 return;
 
             var args = e as MouseEventArgs;
@@ -151,20 +173,50 @@ namespace Piskvorky
                 return;
 
             var coordinates = ConvertToBoardCoordinates(x, y);
-            if (game.NextTurn(coordinates.x, coordinates.y))
+            if (game.NextMove(coordinates.x, coordinates.y))
             {
-                if (game.IsWinner)
+                if (game.Winner)
                 {
                     game.IsRunning = false;
+                    var winner = game.CurrentPlayer == game.PlayerMark ? labelLeft.Text : labelRight.Text;
+                    popupWindow.SetInfoMode($"Vyhrává hráč {winner}");
+                    popupWindow.Visible = true;
                 }
                 else
                 {
                     game.CurrentPlayer = game.CurrentPlayer == Player.X ? Player.O : Player.X;
+                    RedrawMarks();
                 }
+
                 panelCenter.Invalidate();
+
+                cts = new CancellationTokenSource();
+
+                try
+                {
+                    await connection.SendMessage(new NetworkMessage() { X = coordinates.x, Y = coordinates.y });
+                    if (!game.Winner)
+                        await connection.ReceiveMessage(cts.Token);
+                }
+                catch (TaskCanceledException ex)
+                {
+                    statusLabel.Text = ex.Message;
+                }
+                catch (Exception ex)
+                {
+                    statusLabel.Text = ex.Message;
+                }
+                finally
+                {
+                    if (game.Winner)
+                    {
+                        connection.Close();
+                        EnableNetworkButtons(true);
+                    }
+                    cts.Dispose();
+                    cts = null;
+                }
             }
-
-
         }
         private (int x, int y) ConvertToBoardCoordinates(int x, int y)
         {
@@ -177,6 +229,7 @@ namespace Piskvorky
         private void btnCancel_Click(object? sender, EventArgs e)
         {
             cts?.Cancel();
+            popupWindow.Visible = false;
         }
 
         private void btnConfirm_Click(object? sender, EventArgs e)
@@ -195,6 +248,12 @@ namespace Piskvorky
 
         private async void btnRunServer_Click(object sender, EventArgs e)
         {
+            if (game.Winner)
+            {
+                game.Reset();
+                panelCenter.Invalidate();
+            }
+
             EnableNetworkButtons(false);
             popupWindow.SetInfoMode("Server čeká na připojení protihráče...");
 
@@ -217,7 +276,6 @@ namespace Piskvorky
             catch (OperationCanceledException ex)
             {
                 statusLabel.Text = ex.Message;
-                //TODO
             }
             catch (InvalidDataException ex)
             {
@@ -226,6 +284,7 @@ namespace Piskvorky
             finally
             {
                 cts.Dispose();
+                cts = null;
                 popupWindow.Visible = false;
             }
 
@@ -238,11 +297,31 @@ namespace Piskvorky
                 labelRight.Text = message.Name;
                 game.IsRunning = true;
                 RedrawMarks();
+
+                if (game.PlayerMark != game.CurrentPlayer)
+                {
+                    try
+                    {
+                        await connection.ReceiveMessage();
+                    }
+                    catch (Exception ex)
+                    {
+                        statusLabel.Text = ex.Message;
+                        throw;
+                    }
+                }
             }
         }
 
         private async void btnConnectToServer_Click(object sender, EventArgs e)
         {
+            if (game.Winner) 
+            {
+                game.Reset();
+                panelCenter.Invalidate();
+            }
+                
+
             EnableNetworkButtons(false);
             popupWindow.SetInfoMode("Hledám server...");
 
@@ -265,7 +344,6 @@ namespace Piskvorky
             catch (OperationCanceledException ex)
             {
                 statusLabel.Text = ex.Message;
-                //TODO
             }
             catch (InvalidDataException ex)
             {
@@ -274,6 +352,7 @@ namespace Piskvorky
             finally
             {
                 cts.Dispose();
+                cts = null;
                 popupWindow.Visible = false;
             }
 
@@ -287,6 +366,19 @@ namespace Piskvorky
                 labelRight.Text = message.Name;
                 game.IsRunning = true;
                 RedrawMarks();
+
+                if (game.PlayerMark != game.CurrentPlayer)
+                {
+                    try
+                    {
+                        await connection.ReceiveMessage();
+                    }
+                    catch (Exception ex)
+                    {
+                        statusLabel.Text = ex.Message;
+                        throw;
+                    }
+                }
             }
         }
 

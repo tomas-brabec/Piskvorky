@@ -6,20 +6,23 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Piskvorky
 {
-    internal class NetworkConnection
+    public class NetworkConnection
     {
         public static int serverPort = 40701;
         public static int clientPort = 40702;
 
         private TcpClient? tcpClient;
 
+        public event EventHandler<MessageArgs>? OnMessageReceive;
+
         public async Task<NetworkMessage> RunServerAsync(string playerName, Player playerMark, CancellationToken token)
         {
             var acceptedConnection = new IPEndPoint(IPAddress.Any, serverPort);
-            var response = new NetworkMessage() { Name = playerName, Mark = playerMark };
+            var response = new NetworkMessage() { Type = MessageType.Handshake, Name = playerName, Mark = playerMark };
             UdpClient udpClient = null!;
             TcpListener tcpListener = null!;
 
@@ -65,7 +68,7 @@ namespace Piskvorky
         {
             UdpClient udpClient = null!;
             var acceptedConnection = new IPEndPoint(IPAddress.Any, clientPort);
-            var request = new NetworkMessage() { Name = player };
+            var request = new NetworkMessage() { Type = MessageType.Handshake, Name = player };
 
             try
             {
@@ -102,31 +105,102 @@ namespace Piskvorky
             return (message, responseData.RemoteEndPoint);
         }
 
-        public async Task SendMessage()
+        public async Task SendMessage(NetworkMessage message)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (tcpClient != null)
+                {
+                    var stream = tcpClient.GetStream();
+                    var messageBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+                    await stream.WriteAsync(messageBytes, 0, messageBytes.Length);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public async Task<NetworkMessage> ReceiveMessage()
+        public async Task ReceiveMessage(CancellationToken token = default)
         {
-            throw new NotImplementedException();
+            /*if (tcpClient is null)
+                throw new InvalidOperationException();
+
+            var stream = tcpClient.GetStream();
+            var bytes = new byte[256];
+            while (true)
+            {
+                await stream.ReadAsync(bytes, 0, bytes.Length);
+                var message = JsonSerializer.Deserialize<NetworkMessage>(Encoding.UTF8.GetString(bytes));
+
+                if(message != null)
+                    OnMessageReceive?.Invoke(this, new MessageArgs(message));
+            }*/
+
+            try
+            {
+                if(tcpClient != null)
+                {
+                    var stream = tcpClient.GetStream();
+                    var bytes = new byte[256];
+                    await stream.ReadAsync(bytes, 0, bytes.Length, token);
+
+                    var end = bytes.Length;
+
+                    for (int i = 0; i < bytes.Length; i++)
+                    {
+                        if (bytes[i] == 0)
+                        {
+                            end = i;
+                            break;
+                        }
+                    }
+
+                    var message = JsonSerializer.Deserialize<NetworkMessage>(Encoding.UTF8.GetString(bytes, 0, end));
+
+                    if (message is null)
+                        throw new InvalidDataException();
+
+                    OnMessageReceive?.Invoke(this, new MessageArgs(message));   
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void Close()
+        {
+            //tcpClient?.GetStream().Close();
+            tcpClient?.Dispose();
         }
     }
 
-    internal class NetworkMessage
+    public class NetworkMessage
     {
-        //public MessageType Type { get; set; }
-
+        public MessageType Type { get; set; }
         public string Name { get; set; } = "";
         public Player Mark { get; set; }
         public int X { get; set; } = -1;
         public int Y { get; set; } = -1;
     }
 
-    /*internal enum MessageType
+    public class MessageArgs : EventArgs
+    {
+        public NetworkMessage NetworkMessage { get; init; }
+
+        public MessageArgs(NetworkMessage networkMessage)
+        {
+            NetworkMessage = networkMessage;
+        }
+    }
+
+    public enum MessageType
     {
         Handshake,
-        NextTurn,
+        NextMove,
         ConnectionClosed,
-    }*/
+    }
 }
