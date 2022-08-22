@@ -155,6 +155,7 @@ namespace Piskvorky
         public void Close()
         {
             tcpClient?.Dispose();
+            tcpClient = null;
         }
     }
 

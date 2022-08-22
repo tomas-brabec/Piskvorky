@@ -37,7 +37,6 @@ namespace Piskvorky
                 var winner = game.CurrentPlayer == game.PlayerMark ? labelLeft.Text : labelRight.Text;
                 popupWindow.SetInfoMode($"Vyhrává hráč {winner}");
                 popupWindow.Visible = true;
-                cts?.Cancel();
             }
             else
             {
@@ -190,13 +189,12 @@ namespace Piskvorky
 
                 panelCenter.Invalidate();
 
-                cts = new CancellationTokenSource();
-
                 try
                 {
+                    Console.WriteLine("Test");
                     await connection.SendMessage(new NetworkMessage() { X = coordinates.x, Y = coordinates.y });
                     if (!game.Winner)
-                        await connection.ReceiveMessage(cts.Token);
+                        await connection.ReceiveMessage();
                 }
                 catch (TaskCanceledException ex)
                 {
@@ -213,8 +211,6 @@ namespace Piskvorky
                         connection.Close();
                         EnableNetworkButtons(true);
                     }
-                    cts.Dispose();
-                    cts = null;
                 }
             }
         }
@@ -240,6 +236,7 @@ namespace Piskvorky
             else
                 game.PlayerName = popupWindow.textBoxPrompt.Text;
 
+            this.Text = $"Piškvorky - {game.PlayerName}";
             labelLeft.Text = game.PlayerName;
             popupWindow.Visible = false;
 
