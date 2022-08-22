@@ -172,7 +172,7 @@
             this.Controls.Add(this.toolStrip);
             this.MinimumSize = new System.Drawing.Size(656, 486);
             this.Name = "MainForm";
-            this.Text = "Form";
+            this.Text = "Piškvorky";
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
             this.statusStrip.ResumeLayout(false);
