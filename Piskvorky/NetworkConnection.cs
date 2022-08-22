@@ -70,7 +70,7 @@ namespace Piskvorky
                 tcpClient?.Dispose();
                 udpClient = new UdpClient(acceptedConnection);
                 var responseData = await SendHandshakeAsync(udpClient, request, token);
-                tcpClient = new TcpClient(acceptedConnection);
+                tcpClient = new TcpClient();
                 await tcpClient.ConnectAsync(responseData.connection, token);
 
                 return responseData.message;

@@ -200,6 +200,13 @@ namespace Piskvorky
                 {
                     statusLabel.Text = ex.Message;
                 }
+                catch (IOException ex)
+                {
+                    game.Reset();
+                    panelCenter.Invalidate();
+                    EnableNetworkButtons(true);
+                    statusLabel.Text = ex.Message;
+                }
                 catch (Exception ex)
                 {
                     statusLabel.Text = ex.Message;
@@ -251,6 +258,7 @@ namespace Piskvorky
                 panelCenter.Invalidate();
             }
 
+            statusLabel.Text = "";
             EnableNetworkButtons(false);
             popupWindow.SetInfoMode("Server čeká na připojení protihráče...");
 
@@ -301,10 +309,12 @@ namespace Piskvorky
                     {
                         await connection.ReceiveMessage();
                     }
-                    catch (Exception ex)
+                    catch (IOException ex)
                     {
+                        game.Reset();
+                        panelCenter.Invalidate();
+                        EnableNetworkButtons(true);
                         statusLabel.Text = ex.Message;
-                        throw;
                     }
                 }
             }
@@ -318,7 +328,7 @@ namespace Piskvorky
                 panelCenter.Invalidate();
             }
 
-
+            statusLabel.Text = "";
             EnableNetworkButtons(false);
             popupWindow.SetInfoMode("Hledám server...");
 
@@ -337,6 +347,7 @@ namespace Piskvorky
             catch (SocketException ex)
             {
                 statusLabel.Text = ex.Message;
+                throw;
             }
             catch (OperationCanceledException ex)
             {
@@ -370,10 +381,12 @@ namespace Piskvorky
                     {
                         await connection.ReceiveMessage();
                     }
-                    catch (Exception ex)
+                    catch (IOException ex)
                     {
+                        game.Reset();
+                        panelCenter.Invalidate();
+                        EnableNetworkButtons(true);
                         statusLabel.Text = ex.Message;
-                        throw;
                     }
                 }
             }
