@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Piskvorky
 {
@@ -22,7 +17,7 @@ namespace Piskvorky
         public async Task<NetworkMessage> RunServerAsync(string playerName, Player playerMark, CancellationToken token)
         {
             var acceptedConnection = new IPEndPoint(IPAddress.Any, serverPort);
-            var response = new NetworkMessage() { Type = MessageType.Handshake, Name = playerName, Mark = playerMark };
+            var response = new NetworkMessage() { Name = playerName, Mark = playerMark };
             UdpClient udpClient = null!;
             TcpListener tcpListener = null!;
 
@@ -68,7 +63,7 @@ namespace Piskvorky
         {
             UdpClient udpClient = null!;
             var acceptedConnection = new IPEndPoint(IPAddress.Any, clientPort);
-            var request = new NetworkMessage() { Type = MessageType.Handshake, Name = player };
+            var request = new NetworkMessage() { Name = player };
 
             try
             {
@@ -124,23 +119,9 @@ namespace Piskvorky
 
         public async Task ReceiveMessage(CancellationToken token = default)
         {
-            /*if (tcpClient is null)
-                throw new InvalidOperationException();
-
-            var stream = tcpClient.GetStream();
-            var bytes = new byte[256];
-            while (true)
-            {
-                await stream.ReadAsync(bytes, 0, bytes.Length);
-                var message = JsonSerializer.Deserialize<NetworkMessage>(Encoding.UTF8.GetString(bytes));
-
-                if(message != null)
-                    OnMessageReceive?.Invoke(this, new MessageArgs(message));
-            }*/
-
             try
             {
-                if(tcpClient != null)
+                if (tcpClient != null)
                 {
                     var stream = tcpClient.GetStream();
                     var bytes = new byte[256];
@@ -162,7 +143,7 @@ namespace Piskvorky
                     if (message is null)
                         throw new InvalidDataException();
 
-                    OnMessageReceive?.Invoke(this, new MessageArgs(message));   
+                    OnMessageReceive?.Invoke(this, new MessageArgs(message));
                 }
             }
             catch (Exception)
@@ -173,14 +154,13 @@ namespace Piskvorky
 
         public void Close()
         {
-            //tcpClient?.GetStream().Close();
             tcpClient?.Dispose();
         }
     }
 
     public class NetworkMessage
     {
-        public MessageType Type { get; set; }
+        //public MessageType Type { get; set; }
         public string Name { get; set; } = "";
         public Player Mark { get; set; }
         public int X { get; set; } = -1;
@@ -197,10 +177,10 @@ namespace Piskvorky
         }
     }
 
-    public enum MessageType
+    /*public enum MessageType
     {
         Handshake,
         NextMove,
         ConnectionClosed,
-    }
+    }*/
 }

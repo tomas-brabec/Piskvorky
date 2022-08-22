@@ -315,12 +315,12 @@ namespace Piskvorky
 
         private async void btnConnectToServer_Click(object sender, EventArgs e)
         {
-            if (game.Winner) 
+            if (game.Winner)
             {
                 game.Reset();
                 panelCenter.Invalidate();
             }
-                
+
 
             EnableNetworkButtons(false);
             popupWindow.SetInfoMode("Hledám server...");
