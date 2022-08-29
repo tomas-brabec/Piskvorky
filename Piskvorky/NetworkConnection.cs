@@ -100,7 +100,7 @@ namespace Piskvorky
             return (message, responseData.RemoteEndPoint);
         }
 
-        public async Task SendMessage(NetworkMessage message)
+        public async Task SendMessageAsync(NetworkMessage message)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace Piskvorky
             }
         }
 
-        public async Task ReceiveMessage(CancellationToken token = default)
+        public async Task ReceiveMessageAsync(CancellationToken token = default)
         {
             try
             {

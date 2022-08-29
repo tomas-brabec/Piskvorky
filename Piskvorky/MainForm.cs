@@ -192,9 +192,9 @@ namespace Piskvorky
                 try
                 {
                     Console.WriteLine("Test");
-                    await connection.SendMessage(new NetworkMessage() { X = coordinates.x, Y = coordinates.y });
+                    await connection.SendMessageAsync(new NetworkMessage() { X = coordinates.x, Y = coordinates.y });
                     if (!game.Winner)
-                        await connection.ReceiveMessage();
+                        await connection.ReceiveMessageAsync();
                 }
                 catch (TaskCanceledException ex)
                 {
@@ -307,7 +307,7 @@ namespace Piskvorky
                 {
                     try
                     {
-                        await connection.ReceiveMessage();
+                        await connection.ReceiveMessageAsync();
                     }
                     catch (IOException ex)
                     {
@@ -379,7 +379,7 @@ namespace Piskvorky
                 {
                     try
                     {
-                        await connection.ReceiveMessage();
+                        await connection.ReceiveMessageAsync();
                     }
                     catch (IOException ex)
                     {
