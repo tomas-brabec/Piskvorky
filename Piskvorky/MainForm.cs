@@ -204,7 +204,7 @@ namespace Piskvorky
                 {
                     game.Reset();
                     panelCenter.Invalidate();
-                    EnableNetworkButtons(true);
+                    EnableNetworkButtons();
                     statusLabel.Text = ex.Message;
                 }
                 catch (Exception ex)
@@ -216,7 +216,7 @@ namespace Piskvorky
                     if (game.Winner)
                     {
                         connection.Close();
-                        EnableNetworkButtons(true);
+                        EnableNetworkButtons();
                     }
                 }
             }
@@ -247,7 +247,7 @@ namespace Piskvorky
             labelLeft.Text = game.PlayerName;
             popupWindow.Visible = false;
 
-            EnableNetworkButtons(true);
+            EnableNetworkButtons();
         }
 
         private async void btnRunServer_Click(object sender, EventArgs e)
@@ -295,7 +295,7 @@ namespace Piskvorky
 
             if (message is null)
             {
-                EnableNetworkButtons(true);
+                EnableNetworkButtons();
             }
             else
             {
@@ -313,7 +313,7 @@ namespace Piskvorky
                     {
                         game.Reset();
                         panelCenter.Invalidate();
-                        EnableNetworkButtons(true);
+                        EnableNetworkButtons();
                         statusLabel.Text = ex.Message;
                     }
                 }
@@ -366,7 +366,7 @@ namespace Piskvorky
 
             if (message is null)
             {
-                EnableNetworkButtons(true);
+                EnableNetworkButtons();
             }
             else
             {
@@ -385,14 +385,14 @@ namespace Piskvorky
                     {
                         game.Reset();
                         panelCenter.Invalidate();
-                        EnableNetworkButtons(true);
+                        EnableNetworkButtons();
                         statusLabel.Text = ex.Message;
                     }
                 }
             }
         }
 
-        private void EnableNetworkButtons(bool enable)
+        private void EnableNetworkButtons(bool enable = true)
         {
             btnRunServer.Enabled = enable;
             btnConnectToServer.Enabled = enable;
